@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.fy.dao.FyGarbageListDao">
+    
+	<sql id="fyGarbageListColumns">
+		a.id AS "id",
+		a.weight AS "weight",
+		a.weight_choujian AS "weightChoujian",
+		a.choujian_flag AS "choujianFlag",
+		a.shouer_id AS "shouer.id",
+		a.departer_id AS "departer.id",
+		a.depart_id AS "office.id",
+		a.type AS "type",
+		a.status AS "status",
+		a.in_date AS "inDate",
+		a.wu_cha AS "wuCha",
+		a.cheng1_id AS "cheng1Id",
+		a.cheng2_id AS "cheng2Id",
+		a.tiao_ma_uuid AS "tiaoMaUuid",
+		a.tiao_ma_info AS "tiaoMaInfo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name as 'shouer.name',
+		u5.name as 'departer.name',
+		o6.name as 'office.name'
+	</sql>
+	
+	<sql id="fyGarbageListJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.shouer_id
+		LEFT JOIN sys_user u5 ON u5.id = a.departer_id
+		LEFT JOIN sys_office o6 ON o6.id = a.depart_id
+		LEFT JOIN sys_user u15 ON u15.id = a.create_by
+		LEFT JOIN sys_user u17 ON u17.id = a.update_by
+	</sql>
+    
+	<select id="get" resultType="FyGarbageList">
+		SELECT 
+			<include refid="fyGarbageListColumns"/>
+		FROM fy_garbage_list a
+		<include refid="fyGarbageListJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FyGarbageList">
+		SELECT 
+			<include refid="fyGarbageListColumns"/>
+		FROM fy_garbage_list a
+		<include refid="fyGarbageListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="shouer != null and shouer.id != null and shouer.id != ''">
+				AND a.shouer_id = #{shouer.id}
+			</if>
+			<if test="departer != null and departer.id != null and departer.id != ''">
+				AND a.departer_id = #{departer.id}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.depart_id = #{office.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="tiaoMaUuid != null and tiaoMaUuid != ''">
+				AND a.tiao_ma_uuid = #{tiaoMaUuid}
+			</if>
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FyGarbageList">
+		SELECT 
+			<include refid="fyGarbageListColumns"/>
+		FROM fy_garbage_list a
+		<include refid="fyGarbageListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO fy_garbage_list(
+			id,
+			weight,
+			choujian_flag,
+			shouer_id,
+			departer_id,
+			depart_id,
+			type,
+			status,
+			in_date,
+			wu_cha,
+			cheng1_id,
+			cheng2_id,
+			tiao_ma_uuid,
+			tiao_ma_info,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{weight},
+			#{choujianFlag},
+			#{shouer.id},
+			#{departer.id},
+			#{office.id},
+			#{type},
+			#{status},
+			#{inDate},
+			#{wuCha},
+			#{cheng1Id},
+			#{cheng2Id},
+			#{tiaoMaUuid},
+			#{tiaoMaInfo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE fy_garbage_list SET 	
+			weight = #{weight},
+			choujian_flag = #{choujianFlag},
+			shouer_id = #{shouer.id},
+			departer_id = #{departer.id},
+			depart_id = #{office.id},
+			type = #{type},
+			status = #{status},
+			in_date = #{inDate},
+			wu_cha = #{wuCha},
+			cheng1_id = #{cheng1Id},
+			cheng2_id = #{cheng2Id},
+			tiao_ma_uuid = #{tiaoMaUuid},
+			tiao_ma_info = #{tiaoMaInfo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE fy_garbage_list SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
